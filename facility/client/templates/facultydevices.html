@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/footer.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/faculty_devices.css" %}">
+{% endblock %}
+
+{% block title %}
+    {% if faculty.is_partner_organization %}
+        Partner organization Devices
+    {% else %}
+        Faculty Devices
+    {% endif %}
+{% endblock %}
+
+
+{% block main %}
+    <h2>{{ faculty_name }}</h2>
+
+    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);"
+         aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Equipment</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ faculty_name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        {% if departments or laboratories %}
+        <aside class="col-md-3">
+            {% if departments %}
+                <strong>Departments</strong>
+                <ul>
+                    {% for department in departments %}
+                        <li>
+                            <a href="{% url 'departmentdevices' department_id=department.id order='asc' %}">
+                                <button class="btn btn-primary badge bg-department rounded-pill device-tag-break">{{ department.name }}</button>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if laboratories %}
+                <strong>Laboratories</strong>
+                <ul>
+                    {% for laboratory in laboratories %}
+                        <li>
+                            <a href="{% url 'laboratorydevices' laboratory_id=laboratory.id order='asc' %}">
+                                <button class="btn btn-primary badge bg-info text-dark rounded-pill device-tag-break">{{ laboratory.name }}</button>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </aside>
+        {# if there are departments or laboratories, then the main section is smaller #}
+        <section class="col-md-9">
+        {% else %}
+        {# if there are no departments or laboratories, then the main section is larger #}
+        <section class="col-md-12">
+        {% endif %}
+        {% for category in categories %}
+            {# recursive Django category tree #}
+            {% include "partials/category_tree.html" %}
+        {% endfor %}
+        </section>
+    </div>
+
+    {% block script %}
+    <script>
+        $('.panel').on('show.bs.collapse', function () {
+            $(this).siblings('.panel-heading').addClass('active');
+        });
+
+        $('.panel').on('hide.bs.collapse', function () {
+            $(this).siblings('.panel-heading').removeClass('active');
+        });
+    </script>
+    {% endblock %}
+{% endblock %}
